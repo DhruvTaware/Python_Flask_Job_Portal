@@ -1,0 +1,87 @@
+Test_Case_ID,Module,Test_Type,Pre_Conditions,Test_Steps,Test_Data,Expected_Result,Status,Severity
+TC-ENV-01,Environment,Smoke,Virtual environment active,Run pytest test_smoke.py,None,All smoke tests pass and temporary DB is used,Pass,Critical
+TC-ENV-02,Database,Data Integrity,site.db populated,Check row count in site.db before and after test execution,5 users 3 jobs,Row count in production site.db remains identical,Pass,Critical
+TC-MOD-01,Model - User,Unit / ORM,Isolated DB,Instantiate and commit User with required attributes,username=Alice email=alice@corp.com,User committed with generated primary key,Pass,High
+TC-MOD-02,Model - User,Unit / String Rep,User instance,Invoke repr(user),id=42 username=repr_user,Correct formatted User string representation,Pass,Low
+TC-MOD-03,Model - User,Unit / Auth Mixin,User instance,Verify Flask-Login UserMixin properties,is_authenticated is_active is_anonymous get_id(),All UserMixin boolean and identifier methods pass,Pass,Medium
+TC-MOD-04,Model - User,Unit / Security,User instance,Generate bcrypt hash and verify correct vs wrong password,raw=MySecPass2026!,bcrypt verification returns True for valid False for invalid,Pass,Critical
+TC-MOD-05,Model - User,Unit / Callback,User in DB,Execute load_user callback with existing and non-existent IDs,id=1 and id=99999,Returns user model for valid ID None for invalid ID,Pass,High
+TC-MOD-06,Model - User,Unit / Integrity,User in DB,Attempt to commit second User with duplicate username,username=DuplicateUser,Database raises IntegrityError,Pass,High
+TC-MOD-07,Model - User,Unit / Integrity,User in DB,Attempt to commit second User with duplicate email,email=duplicate@test.com,Database raises IntegrityError,Pass,High
+TC-MOD-08,Model - User,Unit / Relationships,User in DB,Attach Jobs and Application instances to User,job_applier and application_submiter,Relationships user.jobs and user.applications populate correctly,Pass,High
+TC-MOD-09,Model - Jobs,Unit / ORM,Company User in DB,Instantiate and commit Jobs model,title=Full Stack Dev industry=Computer And Technology,Job committed with foreign key to company,Pass,High
+TC-MOD-10,Model - Jobs,Unit / String Rep,Job instance,Invoke repr(job),id=10 title=Cloud Architect,Correct formatted Jobs string representation,Pass,Low
+TC-MOD-11,Model - Jobs,Unit / Default,Company in DB,Commit Jobs model without explicit date_posted,None,date_posted default is dynamic datetime.now timestamp,Pass,High
+TC-MOD-12,Model - Application,Unit / ORM,Company Seeker Job in DB,Instantiate and commit Application record,gender=Male degree=bMaster exp=5 cv=test.png,Application committed and linked to seeker and job,Pass,High
+TC-MOD-13,Model - Application,Unit / String Rep,Application instance,Invoke repr(app),id=7 degree=aPHD,Correct formatted Application string representation,Pass,Low
+TC-MOD-14,Model - Review,Unit / ORM,Isolated DB,Instantiate and commit Review record,username=HappyUser review=Great portal,Review committed successfully,Pass,Medium
+TC-MOD-15,Model - Review,Unit / String Rep,Review instance,Invoke repr(review),username=TestReviewer,Correct formatted Review string representation,Pass,Low
+TC-MOD-16,Model - Review,Unit / Integrity,Review in DB,Attempt to commit second Review with duplicate username,username=UniqueReviewer,Database raises IntegrityError,Pass,High
+TC-FORM-01,Form - Registration,Unit / EP,Flask request context,Submit valid Job Seeker registration data,usertype=Job Seeker username=JaneDoe email=jane@example.com,Form validation succeeds (valid=True),Pass,High
+TC-FORM-02,Form - Registration,Unit / EP,Flask request context,Submit valid Company registration data,usertype=Company username=GlobalTech email=recruiting@global.com,Form validation succeeds (valid=True),Pass,High
+TC-FORM-03,Form - Registration,Unit / EP,Flask request context,Submit empty values for mandatory fields,All fields empty,Form validation fails with errors on required fields,Pass,High
+TC-FORM-04,Form - Registration,Unit / EP,Flask request context,Submit malformed email addresses (plain text missing @ or domain),email=plainaddress or @missing.com,Form validation fails with Email syntax error,Pass,High
+TC-FORM-05,Form - Registration,Unit / EP,Flask request context,Submit mismatched password and confirm_password,pwd=Pass1 confirm=Pass2,Form validation fails with EqualTo mismatch error,Pass,High
+TC-FORM-06,Form - Registration,Unit / BVA,Flask request context,Username length = 1 char (below min=2),username=A,Validation fails with Length(min=2 max=20) error,Pass,High
+TC-FORM-07,Form - Registration,Unit / BVA,Flask request context,Username length = 2 chars (at min=2),username=AB,Validation succeeds,Pass,High
+TC-FORM-08,Form - Registration,Unit / BVA,Flask request context,Username length = 3 chars (above min=2),username=ABC,Validation succeeds,Pass,High
+TC-FORM-09,Form - Registration,Unit / BVA,Flask request context,Username length = 19 chars (below max=20),username=A*19,Validation succeeds,Pass,High
+TC-FORM-10,Form - Registration,Unit / BVA,Flask request context,Username length = 20 chars (at max=20),username=A*20,Validation succeeds,Pass,High
+TC-FORM-11,Form - Registration,Unit / BVA,Flask request context,Username length = 21 chars (above max=20),username=A*21,Validation fails with Length(min=2 max=20) error,Pass,High
+TC-FORM-12,Form - Registration,Unit / Custom Validator,Existing user in DB,Submit registration with existing username,username=ExistingUser,Validation fails with 'That username is already taken',Pass,High
+TC-FORM-13,Form - Registration,Unit / Custom Validator,Existing user in DB,Submit registration with existing email,email=existing@test.com,Validation fails with 'That email is already taken',Pass,High
+TC-FORM-14,Form - Login,Unit / EP,Flask request context,Submit valid login inputs,usertype=Company email=company@login.com pwd=Pass123! remember=True,Form validation succeeds (valid=True),Pass,High
+TC-FORM-15,Form - Login,Unit / EP,Flask request context,Submit empty credentials,email='' pwd='',Form validation fails with required field errors,Pass,High
+TC-FORM-16,Form - Login,Unit / EP,Flask request context,Submit malformed email address,email='no_at_symbol',Form validation fails with Email syntax error,Pass,High
+TC-FORM-17,Form - Job,Unit / EP,Flask request context,Submit valid job posting inputs,title=Senior QA industry=Computer And Technology desc=Full desc,Form validation succeeds (valid=True),Pass,High
+TC-FORM-18,Form - Job,Unit / EP,Flask request context,Submit missing title or description,title='' desc='',Form validation fails with required field errors,Pass,High
+TC-FORM-19,Form - Job,Unit / EP,Flask request context,Submit industry value outside choices,industry='UnknownSector',Form validation fails with invalid choice error,Pass,Medium
+TC-FORM-20,Form - Job,Unit / BVA,Flask request context,Job title length = 1 char (below min=2),title=Q,Validation fails with Length(min=2 max=100) error,Pass,High
+TC-FORM-21,Form - Job,Unit / BVA,Flask request context,Job title length = 2 chars (at min=2),title=QA,Validation succeeds,Pass,High
+TC-FORM-22,Form - Job,Unit / BVA,Flask request context,Job title length = 100 chars (at max=100),title=T*100,Validation succeeds,Pass,High
+TC-FORM-23,Form - Job,Unit / BVA,Flask request context,Job title length = 101 chars (above max=100),title=T*101,Validation fails with Length(min=2 max=100) error,Pass,High
+TC-FORM-24,Form - Application,Unit / EP,Flask request context,Submit valid application with PNG image resume,gender=Female degree=cBachelor exp=3 cv=file.png,Form validation succeeds (valid=True),Pass,High
+TC-FORM-25,Form - Application,Unit / EP,Flask request context,Submit application without mandatory cover letter,cover_letter='',Validation fails with DataRequired error,Pass,High
+TC-FORM-26,Form - Application,Unit / EP,Flask request context,Submit application without selecting resume file,cv=None,Validation fails with FileRequired error,Pass,Critical
+TC-FORM-27,Form - Application,Unit / EP,Flask request context,Upload supported resume formats (.jpg .png .bmp),cv=cv.jpg / cv.png / cv.bmp,Form validation succeeds for all allowed image formats,Pass,High
+TC-FORM-28,Form - Application,Unit / EP,Flask request context,Upload unsupported resume formats (.pdf .docx .exe .txt .zip),cv=resume.pdf / payload.exe,Validation fails with FileAllowed 'Images only' error,Pass,Critical
+TC-FORM-29,Form - Application,Unit / EP,Flask request context,Submit non-integer string in experience field,experience='five_years',Validation fails with IntegerField numeric error,Pass,Medium
+TC-FORM-30,Form - Review,Unit / EP,Flask request context,Submit valid review inputs,username=Employer1 review=Great talent found,Form validation succeeds (valid=True),Pass,Medium
+TC-FORM-31,Form - Review,Unit / EP,Flask request context,Submit empty username,username='',Validation fails with DataRequired error,Pass,Medium
+TC-FORM-32,Form - Review,Unit / EP,Flask request context,Submit empty review body,review='',Validation fails with DataRequired error,Pass,Medium
+TC-AUTH-01,Authentication,Integration / Flow,Guest on /register,Submit valid registration HTTP POST,username=JobSeeker1 email=js1@test.com,Account created and user redirected to /login,Pass,High
+TC-AUTH-02,Authentication,Integration / Flow,Guest on /register,Submit valid company registration HTTP POST,username=Corp1 email=corp1@test.com,Company created and redirected to /login,Pass,High
+TC-AUTH-03,Authentication,Integration / Flow,Existing user in DB,Submit registration with existing username,username=JaneCandidate,Rejected with 'That username is already taken',Pass,High
+TC-AUTH-04,Authentication,Integration / Flow,Existing user in DB,Submit registration with existing email,email=hr@testcorp.com,Rejected with 'That email is already taken',Pass,High
+TC-AUTH-05,Authentication,Integration / Flow,Registered user,Submit login HTTP POST,email=jane@example.com usertype=Job Seeker,Session established and redirected to /show_jobs,Pass,High
+TC-AUTH-06,Authentication,Integration / Flow,Registered company,Submit company login HTTP POST,email=hr@testcorp.com usertype=Company,Session established and redirected to /posted_jobs,Pass,High
+TC-AUTH-07,Authentication,Integration / Security,Registered user,Submit login with wrong password,password=WrongPassword999,Login rejected with flash danger message,Pass,High
+TC-AUTH-08,Authentication,Integration / Security,Guest,Submit login with non-existent email,email=nobody@nowhere.com,Login rejected with flash danger message,Pass,High
+TC-AUTH-09,Authentication,Integration / Validation,Registered Company,Submit login selecting Job Seeker usertype,usertype=Job Seeker,Login rejected due to usertype mismatch,Pass,High
+TC-AUTH-10,Authentication,Integration / Session,Authenticated user,Access /logout endpoint,User session,User logged out and redirected to /show_jobs,Pass,High
+TC-AUTH-11,Authentication,Integration / Redirect,Guest,Submit login with next parameter,next=/post_jobs,Redirected to requested next parameter URL,Pass,Medium
+TC-JOB-01,Job Management,Integration / Flow,Authenticated Company,Submit job posting HTTP POST,title=Senior QA industry=Computer And Technology,Job opening created and rendered on /posted_jobs,Pass,High
+TC-JOB-02,Job Management,Integration / Validation,Authenticated Company,Submit job posting without title,title='',Rejected with required field validation error,Pass,High
+TC-JOB-03,Job Management,Integration / Validation,Authenticated Company,Submit job posting without description,description='',Rejected with required field validation error,Pass,High
+TC-JOB-04,Job Management,Integration / Privacy,Authenticated Company,Access /posted_jobs dashboard,Two companies with jobs,Company only sees its own posted job openings,Pass,High
+TC-APP-01,Application,Integration / Flow,Authenticated Seeker,Submit application HTTP POST with multipart resume,cv=test_resume.png exp=4,Application recorded with randomized filename,Pass,Critical
+TC-APP-02,Application,Integration / Upload,Authenticated Seeker,Submit application with JPG image resume,cv=scan.jpg,Application accepted and saved in DB,Pass,High
+TC-APP-03,Application,Integration / Validation,Authenticated Seeker,Submit application without resume file,cv=None,Rejected with missing file error,Pass,Critical
+TC-APP-04,Application,Integration / Security,Authenticated Seeker,Submit application with PDF document,cv=resume.pdf,Rejected with 'Images only' error,Pass,Critical
+TC-APP-05,Security,Integration / Auth,Rival Company session,Access /show_applications/<jobid> of another company,job_id=TestCorp_Job,HTTP 200 with 'Access denied' flash message,Pass,Critical
+TC-APP-06,Application,Integration / Security,Authenticated Seeker,Submit application with executable exploit.exe,cv=exploit.exe,Rejected with 'Images only' error,Pass,Critical
+TC-APP-07,Application,Integration / Validation,Authenticated Seeker,Apply to non-existent job ID,job_id=99999,Redirected with 'Job not found' message,Pass,High
+TC-SEC-01,Access Control,Integration / Auth,Anonymous Guest,Access protected endpoints (/post_jobs /posted_jobs /show_applications /resume /meeting),None,Redirected to /login with next parameter,Pass,Critical
+TC-SEC-02,Access Control,Integration / RBAC,Authenticated Seeker,Access /post_jobs or /posted_jobs,Seeker session,Redirected with 'Only registered companies' warning,Pass,Critical
+TC-SEC-03,Access Control,Integration / RBAC,Authenticated Company,Access /post_cvs/<jobid>,Company session,Redirected with 'Only job seekers' warning,Pass,High
+TC-SEC-04,Access Control,Integration / Privacy,Applicant Candidate,Access /resume/<application_id> for own submission,Candidate session,HTTP 200 resume displayed,Pass,High
+TC-SEC-05,Access Control,Integration / Privacy,Hiring Company,Access /resume/<application_id> for own job,Employer session,HTTP 200 resume displayed,Pass,High
+TC-SEC-06,Access Control,Integration / Security,Unauthorized Candidate,Access /resume/<application_id> of another candidate,Other seeker session,Access denied with flash danger message,Pass,Critical
+TC-SEC-07,Access Control,Integration / Security,Rival Company,Access /resume/<application_id> of competitor job,Competitor session,Access denied with flash danger message,Pass,Critical
+TC-SEC-08,Access Control,Integration / Security,Authenticated user,Access /meeting/<id> interview room,Authorized vs Unauthorized,Authorized admitted (200) unauthorized rejected,Pass,High
+TC-E2E-01,Job Board,E2E / Browser,Live server on ephemeral port,Open homepage / and verify branding,Header links and seeded job card,Branding 'Job Portal' and job title visible,Pass,High
+TC-E2E-02,Authentication,E2E / Browser,Seeded candidate in DB,Fill login form with valid credentials and submit,candidate@selenium.org / password123,Redirects to /show_jobs and displays Log out button,Pass,Critical
+TC-E2E-03,Authentication,E2E / Browser,Guest on /login,Fill login form with wrong password and submit,WrongPassword999!,Danger alert displayed and remains on /login,Pass,High
+TC-E2E-04,Access Control,E2E / Browser,Unauthenticated browser session,Navigate directly to protected /post_jobs,None,Browser redirected to /login with next parameter,Pass,Critical
+TC-E2E-05,Application,E2E / Browser,Authenticated Seeker in browser,Fill application form and upload PNG resume file,test_resume.png exp=4,Redirects to /show_jobs with success alert and DB record persisted,Pass,Critical
+

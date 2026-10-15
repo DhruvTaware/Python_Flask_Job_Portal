@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, IntegerField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from app.models import User
@@ -52,7 +52,7 @@ class ReviewForm(FlaskForm):
 
 class JobForm(FlaskForm):
     title = StringField('Job Title',
-                        validators=[DataRequired(), Length(min=2, max=20)])
+                        validators=[DataRequired(), Length(min=2, max=100)])
     industry = SelectField('Industry', choices=[('Construction', 'Construction'),
                                                 ('Education', 'Education'),
                                                 ('Food And Beverage', 'Food and Beverage'),
@@ -118,7 +118,7 @@ class ApplicationForm(FlaskForm):
                            validators=[DataRequired()])
     experience = IntegerField('Professional Experience in years',
                               validators=[DataRequired()])
-    cv = FileField('Update Resume', validators=[FileAllowed(['jpg', 'png', 'bmp'])])
+    cv = FileField('Upload Resume', validators=[FileRequired(message='Please upload your resume.'), FileAllowed(['jpg', 'png', 'bmp'], 'Images only (jpg, png, bmp)!')])
     cover_letter = TextAreaField('Cover Letter',
                                  validators=[DataRequired()])
     submit = SubmitField('Submit')
